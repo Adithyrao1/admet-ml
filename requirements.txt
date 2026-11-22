@@ -1,0 +1,18 @@
+# Versions the reported results were produced with.
+rdkit==2026.9.2
+numpy==2.5.5
+pandas==3.1.1
+scikit-learn==1.9.1
+xgboost==3.4.1
+shap==0.54.1
+matplotlib==3.11.2
+seaborn==0.13.2
+PyYAML==6.0.4
+requests==2.34.2
+tqdm==4.70.1
+
+# Demo app
+streamlit>=1.40
+
+# Tests
+pytest==9.2.0

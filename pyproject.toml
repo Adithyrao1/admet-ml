@@ -1,0 +1,35 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "admet-ml"
+version = "0.1.0"
+description = "Classical ML baselines for ADMET property prediction from molecular structure"
+readme = "README.md"
+requires-python = ">=3.10"
+
+dependencies = [
+    "rdkit",
+    "numpy",
+    "pandas",
+    "scikit-learn",
+    "xgboost",
+    "shap",
+    "matplotlib",
+    "seaborn",
+    "pyyaml",
+    "requests",
+    "tqdm",
+]
+
+[project.optional-dependencies]
+app = ["streamlit"]
+dev = ["pytest"]
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+filterwarnings = ["ignore::DeprecationWarning"]

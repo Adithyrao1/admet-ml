@@ -1,0 +1,16 @@
+descriptor,mean_abs_shap,direction,value_shap_corr
+TPSA,0.59424,higher → less likely,-0.807
+VSA_EState3,0.32344,higher → less likely,-0.533
+MaxPartialCharge,0.26546,higher → more likely,0.739
+PEOE_VSA10,0.25569,higher → less likely,-0.651
+NumHDonors,0.25438,higher → less likely,-0.559
+qed,0.23692,higher → more likely,0.911
+MinPartialCharge,0.23578,higher → more likely,0.684
+PEOE_VSA3,0.22662,higher → less likely,-0.796
+PEOE_VSA9,0.22401,higher → less likely,-0.867
+EState_VSA10,0.22033,higher → less likely,-0.702
+NHOHCount,0.21419,higher → less likely,-0.697
+VSA_EState5,0.21047,higher → more likely,0.145
+MolLogP,0.20399,higher → more likely,0.419
+SlogP_VSA10,0.18747,higher → more likely,0.588
+MinEStateIndex,0.18024,higher → more likely,0.155

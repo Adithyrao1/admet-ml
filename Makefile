@@ -4,9 +4,9 @@
 PYTHON ?= python
 RESULTS ?= results/results.csv
 
-.PHONY: all install test experiments analyze explain app clean
+.PHONY: all install test experiments analyze explain artifacts app clean
 
-all: experiments analyze explain
+all: experiments analyze explain artifacts
 
 install:
 	$(PYTHON) -m pip install -r requirements.txt
@@ -26,7 +26,11 @@ analyze:
 explain:
 	$(PYTHON) scripts/explain.py --dataset bbb_martins --results $(RESULTS)
 
-app:
+# Pre-train the models the demo serves, into models/.
+artifacts:
+	$(PYTHON) scripts/build_artifacts.py
+
+app: artifacts
 	$(PYTHON) -m streamlit run app/streamlit_app.py
 
 clean:

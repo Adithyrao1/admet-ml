@@ -35,18 +35,10 @@ from sklearn.metrics import roc_curve
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "src"))
 
 from admet.data import LABEL_COL, get_split  # noqa: E402
+from admet.domain import BBB_EXPECTED_DIRECTION  # noqa: E402
 from admet.features import FeatureConfig, featurize_cached  # noqa: E402
 from admet.models import build_model, set_scale_pos_weight  # noqa: E402
 from admet.plots import plot_descriptor_importance, plot_roc_curves  # noqa: E402
-
-# Descriptors whose expected direction is well established for BBB penetration.
-BBB_EXPECTED_DIRECTION = {
-    "TPSA": "negative",
-    "MolWt": "negative",
-    "NumHDonors": "negative",
-    "NHOHCount": "negative",
-    "MolLogP": "positive",
-}
 
 
 def _featurize(split_df: pd.DataFrame, config: FeatureConfig, tag: str):
@@ -179,7 +171,7 @@ def main(argv: list[str] | None = None) -> int:
     if args.dataset == "bbb_martins":
         print("\nPharmacology sanity check (expected from CNS drug design):")
         lookup = {row["descriptor"]: row["value_shap_corr"] for row in rows}
-        for descriptor, expected in BBB_EXPECTED_DIRECTION.items():
+        for descriptor, (expected, _) in BBB_EXPECTED_DIRECTION.items():
             if descriptor not in lookup:
                 print(f"  {descriptor:<12} not in top 15")
                 continue

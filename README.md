@@ -239,8 +239,8 @@ cd admet-ml
 pip install -r requirements.txt
 pip install -e .
 
-pytest -q                      # 18 tests
-make all                       # or run the three scripts below
+pytest -q                      # 26 tests
+make all                       # or run the scripts below
 ```
 
 ```bash
@@ -258,13 +258,32 @@ faster — a single tuned model is seconds to a few minutes.
 ### Demo
 
 ```bash
+python scripts/build_artifacts.py     # pre-train the served models (~3.5 MB)
 streamlit run app/streamlit_app.py
 ```
 
-Paste a SMILES string and the app returns both predictions, the physicochemical
-profile, Lipinski rule-of-5 compliance, and the Tanimoto similarity to the
-nearest training molecule — so you can see when a prediction is an extrapolation.
-Deployment steps are in [docs/DEPLOY.md](docs/DEPLOY.md).
+Deployment steps are in [docs/DEPLOY.md](docs/DEPLOY.md). The app runs
+server-side: the browser sends a SMILES string over a WebSocket, Python does the
+featurization and inference, and the result renders back. Models are pre-trained
+into `models/` rather than fitted at startup, so a cold start costs a second
+instead of a minute.
+
+Five tabs, because a prediction box alone says nothing about whether the
+predictions deserve trust:
+
+| Tab | What it shows |
+|---|---|
+| **Predict** | Structure, physicochemical profile, Lipinski check, both endpoint probabilities, and a per-molecule SHAP breakdown of *why* |
+| **Benchmark** | The 48-run table, filterable, with the Dummy baseline kept in view |
+| **Why the split matters** | Toggle scaffold ↔ random and watch MCC move while ROC-AUC barely does |
+| **What it learned** | SHAP ranking plus the pharmacology check as a live pass/fail table |
+| **Where it fails** | Held-out molecules with true labels, memorised molecules flagged as such, and the Sucrose extrapolation |
+
+**Every prediction is labelled `train`, `holdout` or `unseen`.** A molecule the
+model memorised is marked as recall rather than evidence, which is the
+difference between a demo that proves something and one that just looks
+convincing — Caffeine, Atenolol, Aspirin and 2-Nitrofluorene are all in the
+training data.
 
 ---
 
@@ -277,34 +296,43 @@ src/admet/
   models.py      Dummy / LogReg / RandomForest / XGBoost pipelines + search spaces
   evaluate.py    ROC-AUC, PR-AUC, F1, MCC, balanced accuracy, confusion matrix
   experiment.py  one run end to end; appends to the results CSV
+  domain.py      pharmacology expectations, written down before seeing results
   plots.py       figures, rendered for light and dark themes
 scripts/
-  run_experiment.py  resumable sweep CLI
-  analyze.py         results CSV -> summary tables + figures
-  explain.py         ROC curves, SHAP, pharmacology direction check
-app/streamlit_app.py  interactive demo
-tests/                18 tests, including leakage and baseline invariants
+  run_experiment.py   resumable sweep CLI
+  analyze.py          results CSV -> summary tables + figures
+  explain.py          ROC curves, SHAP, pharmacology direction check
+  build_artifacts.py  pre-train the models the demo serves
+app/streamlit_app.py  five-tab interactive demo
+models/               pre-trained models, training SMILES, holdout sets (3.5 MB)
+tests/                26 tests: leakage, baseline invariants, artifacts, app run
 ```
 
 ---
 
 ## Where it fails
 
-Spot-checking the demo on molecules with well-known behaviour:
+Spot-checking a demo on famous drugs is close to worthless, because the famous
+drugs are usually *in the training set*. Checking membership explicitly:
 
-| Molecule | BBB prediction | Reality |
-|---|---|---|
-| Caffeine | 97.6% | ✅ CNS-active |
-| Diazepam | 100.0% | ✅ CNS-active |
-| Atenolol | 3.2% | ✅ known poor CNS penetration |
-| 2-Nitrofluorene | 97.2% Ames | ✅ known mutagen |
-| **Sucrose** | **53.0%** | ❌ certainly does not cross |
+| Molecule | Prediction | Status | What it proves |
+|---|---|---|---|
+| Caffeine | 97.6% BBB | **in training** | nothing — recall |
+| Atenolol | 3.2% BBB | **in training** | nothing — recall |
+| Aspirin | — | **in training** | nothing — recall |
+| 2-Nitrofluorene | 97.2% Ames | **in training** | nothing — recall |
+| **Sucrose** | **53.0% BBB** | **not in dataset** | a real limitation |
 
-Sucrose is the interesting failure. It is a highly polar sugar, and the model
-returns a coin flip rather than a confident "no" — sugars are barely represented
-among the 1,382 training molecules, so the prediction is an extrapolation. This
-is precisely what the demo's nearest-neighbour Tanimoto warning is for: a
-confident-looking percentage on an unfamiliar scaffold deserves no trust.
+Sucrose is the honest failure. It is a highly polar sugar that certainly does
+not reach the brain, and the model returns a coin flip. Its nearest training
+neighbour sits at Tanimoto 0.41 and sugars are barely represented among the
+1,382 training molecules, so this is extrapolation rather than judgement — and
+the expected answer comes from pharmacology, not from the benchmark, since
+sucrose carries no BBB label at all.
+
+This is why the app labels every prediction `train` / `holdout` / `unseen`, and
+why the "Where it fails" tab draws its evidence from genuinely held-out
+molecules with known labels instead of from recognisable drug names.
 
 ## Limitations
 

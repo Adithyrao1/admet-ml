@@ -1,23 +1,19 @@
-# ADMET-ML — Predicting Drug Properties from Molecular Structure
+# ADMET-ML
 
-Classical machine learning baselines for two ADMET endpoints that matter early in
-drug discovery: **does a molecule reach the brain**, and **is it mutagenic**.
-Built on RDKit features and scikit-learn, benchmarked under the Therapeutics Data
-Commons (TDC) protocol, and shipped with an interactive demo.
+Classical ML baselines for two ADMET endpoints: blood-brain barrier penetration
+and Ames mutagenicity. RDKit features, scikit-learn, benchmarked under the
+Therapeutics Data Commons (TDC) protocol.
 
-> **TL;DR** — A Random Forest on RDKit features reaches **0.924 ± 0.024 ROC-AUC**
-> on blood-brain barrier penetration under TDC's scaffold split, in the same
-> range as published leaderboard entries (~0.92) — trained in under three minutes
-> on a laptop CPU, with no GPU and no neural network. On Ames mutagenicity,
-> XGBoost reaches **0.856 ± 0.003**.
->
-> The more useful findings are about *evaluation*: a model that ignores the
-> molecule entirely scores **F1 = 0.879** on BBB, and on that same dataset
-> ROC-AUC shows **no generalization gap at all** (+0.003) while MCC shows a large
-> one (+0.120). Headline metrics on imbalanced chemical data are easy to fake,
-> and most of this repository is about not fooling yourself.
+Random Forest reaches **0.924 ± 0.024 ROC-AUC** on BBB under TDC's scaffold
+split (published leaderboard range is ~0.92), trained on a laptop CPU. XGBoost
+reaches **0.856 ± 0.003** on Ames.
 
-<!-- Add after deploying: [**▶ Try the live demo**](https://your-app.streamlit.app) -->
+Two evaluation results shape how those numbers are reported: a model that
+ignores the molecule entirely scores **F1 = 0.879** on BBB, and on that dataset
+ROC-AUC shows a +0.003 gap between random and scaffold splits while MCC shows
++0.120.
+
+<!-- Add after deploying: [Live demo](https://your-app.streamlit.app) -->
 
 ---
 
@@ -84,7 +80,7 @@ linear baseline, and XGBoost's seed-to-seed spread is tiny (±0.003).
 
 ---
 
-## Three findings worth the read
+## Findings
 
 ### 1. A model that ignores the molecule scores F1 = 0.879
 
@@ -146,7 +142,7 @@ is within 0.014 of the best model on BBB while training 10× faster.
 
 ---
 
-## What the model learned
+## Feature attribution
 
 A good score is not evidence that a model learned chemistry — it may have learned
 an artefact of the split. So the descriptors driving its predictions are checked
@@ -310,7 +306,7 @@ tests/                26 tests: leakage, baseline invariants, artifacts, app run
 
 ---
 
-## Where it fails
+## Failure cases
 
 Spot-checking a demo on famous drugs is close to worthless, because the famous
 drugs are usually *in the training set*. Checking membership explicitly:

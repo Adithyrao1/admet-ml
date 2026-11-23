@@ -278,7 +278,7 @@ with st.sidebar:
 - SHAP computed on a descriptor-only model
 """
         )
-    st.caption("Research baselines. Not for clinical use.")
+    st.caption("Research baselines.")
 
 models = load_models()
 if not models:

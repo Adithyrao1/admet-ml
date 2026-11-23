@@ -541,7 +541,7 @@ with tab_interp:
     else:
         lookup = dict(zip(importance["descriptor"], importance["value_shap_corr"]))
         checks = []
-        for descriptor, (expected, rationale) in BBB_EXPECTED_DIRECTION.items():
+        for descriptor, (expected, _) in BBB_EXPECTED_DIRECTION.items():
             if descriptor not in lookup:
                 checks.append(
                     {
@@ -550,7 +550,6 @@ with tab_interp:
                         "Observed": "-",
                         "r": None,
                         "Match": "not in top 15",
-                        "Basis": rationale,
                     }
                 )
                 continue
@@ -563,7 +562,6 @@ with tab_interp:
                     "Observed": observed,
                     "r": round(correlation, 2),
                     "Match": "yes" if observed == expected else "no",
-                    "Basis": rationale,
                 }
             )
 

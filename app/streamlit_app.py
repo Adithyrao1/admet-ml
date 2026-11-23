@@ -622,10 +622,6 @@ with tab_limits:
                 }
             )
         st.dataframe(pd.DataFrame(rows), hide_index=True, use_container_width=True)
-        st.caption(
-            f"{correct_count}/{len(rows)} on this draw. Full-holdout numbers are on "
-            "the Benchmark tab."
-        )
 
     st.markdown("**Training-set molecules**")
     memorised = []
@@ -647,7 +643,6 @@ with tab_limits:
             }
         )
     st.dataframe(pd.DataFrame(memorised), hide_index=True, use_container_width=True)
-    st.caption("Recalled, not inferred. Excluded from any claim about accuracy.")
 
     st.markdown("**Out of domain**")
     sucrose = EXAMPLES["Sucrose"]
@@ -656,19 +651,3 @@ with tab_limits:
     columns = st.columns([1, 1, 2])
     columns[0].metric("Sucrose, BBB", f"{probability:.1%}" if probability else "-")
     columns[1].metric("Nearest train", f"{similarity:.2f}" if similarity else "-")
-    columns[2].caption(
-        "A polar sugar that does not reach the brain, scored near chance. Not in "
-        "the BBB dataset, so there is no label to check against; the expected "
-        "answer comes from pharmacology."
-    )
-
-    st.markdown(
-        """
-**Known limits**
-
-- Two binary endpoints; no ADME regression tasks.
-- 2k and 7k molecules. A graph neural network would likely lead at 100k.
-- Ames is one assay, not a full genotoxicity assessment.
-- Tanimoto similarity is a heuristic, not calibrated confidence.
-"""
-    )
